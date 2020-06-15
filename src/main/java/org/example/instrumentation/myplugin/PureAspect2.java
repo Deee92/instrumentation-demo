@@ -14,26 +14,33 @@ public class PureAspect2 {
         private static final TimerName timer = Agent.getTimerName(PureMethodAdvice.class);
         private static final String transactionType = "Pure";
         private static Logger logger = Logger.getLogger(PureMethodAdvice.class);
+        private static XStream xStream = new XStream();
 
         @OnBefore
-        public static TraceEntry onBefore(OptionalThreadContext context, @BindMethodName String methodName) {
-            logger.info("methodName: " + methodName);
+        public static TraceEntry onBefore(OptionalThreadContext context,
+                                          @BindReceiver Object receivingObject,
+                                          @BindMethodName String methodName) {
+            try {
+                xStream.toXML(receivingObject, new FileWriter("/home/user/object-data/xstream-receiving-2.xml", true));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             MessageSupplier messageSupplier = MessageSupplier.create(
-                    "method: {}",
+                    "className: {}, methodName: {}",
+                    PureMethodAdvice.class.getAnnotation(Pointcut.class).className(),
                     methodName
             );
             return context.startTransaction(transactionType, methodName, messageSupplier, timer, OptionalThreadContext.AlreadyInTransactionBehavior.CAPTURE_NEW_TRANSACTION);
         }
 
         @OnReturn
-        public static void onReturn(@BindReturn Object returnedObject, @BindTraveler TraceEntry traceEntry) {
+        public static void onReturn(@BindReturn Object returnedObject,
+                                    @BindTraveler TraceEntry traceEntry) {
             try {
-                XStream xStream = new XStream();
-                xStream.toXML(returnedObject, new FileWriter("/home/user/xstream-2.xml", true));
+                xStream.toXML(returnedObject, new FileWriter("/home/user/object-data/xstream-2.xml", true));
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            logger.info("returnedObject: " + returnedObject.getClass().getSimpleName());
             traceEntry.end();
         }
 

@@ -4,11 +4,12 @@ import com.thoughtworks.xstream.XStream;
 import org.glowroot.agent.plugin.api.*;
 import org.glowroot.agent.plugin.api.weaving.*;
 
+import java.io.File;
 import java.io.FileWriter;
 
-public class PureAspect4 {
-    @Pointcut(className = "com.turn.ttorrent.common.protocol.PeerMessage$Type", methodName = "equals",
-            methodParameterTypes = {"byte"}, timerName = "peer message type equality")
+public class PureAspect5 {
+    @Pointcut(className = "com.turn.ttorrent.client.peer.SharingPeer", methodName = "isInterested",
+            methodParameterTypes = {}, timerName = "sharing peer interested")
     public static class PureMethodAdvice {
 
         private static final TimerName timer = Agent.getTimerName(PureMethodAdvice.class);
@@ -19,11 +20,9 @@ public class PureAspect4 {
         @OnBefore
         public static TraceEntry onBefore(OptionalThreadContext context,
                                           @BindReceiver Object receivingObject,
-                                          @BindMethodName String methodName,
-                                          @BindParameter Object parameterObject) {
+                                          @BindMethodName String methodName) {
             try {
-                xStream.toXML(receivingObject, new FileWriter("/home/user/object-data/xstream-receiving-4.xml", true));
-                xStream.toXML(parameterObject, new FileWriter("/home/user/object-data/xstream-para-4.xml", true));
+                xStream.toXML(receivingObject, new FileWriter("/home/user/object-data/xstream-receiving-5.xml", true));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -39,7 +38,7 @@ public class PureAspect4 {
         public static void onReturn(@BindReturn Object returnedObject,
                                     @BindTraveler TraceEntry traceEntry) {
             try {
-                xStream.toXML(returnedObject, new FileWriter("/home/user/object-data/xstream-4.xml", true));
+                xStream.toXML(returnedObject, new FileWriter("/home/user/object-data/xstream-5.xml", true));
             } catch (Exception e) {
                 e.printStackTrace();
             }

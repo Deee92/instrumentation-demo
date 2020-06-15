@@ -19,43 +19,33 @@ public class PureAspect1 {
         private static final TimerName timer = Agent.getTimerName(PureMethodAdvice.class);
         private static final String transactionType = "Pure";
         private static Logger logger = Logger.getLogger(PureMethodAdvice.class);
+        private static XStream xStream = new XStream();
 
         @OnBefore
-        public static TraceEntry onBefore(OptionalThreadContext context, @BindMethodName String methodName) {
-            logger.info("methodName: " + methodName);
+        public static TraceEntry onBefore(OptionalThreadContext context,
+                                          @BindReceiver Object receivingObject,
+                                          @BindMethodName String methodName) {
+            try {
+                xStream.toXML(receivingObject, new FileWriter("/home/user/object-data/xstream-receiving-1.xml", true));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             MessageSupplier messageSupplier = MessageSupplier.create(
-                    "method: {}",
+                    "className: {}, methodName: {}",
+                    PureMethodAdvice.class.getAnnotation(Pointcut.class).className(),
                     methodName
             );
             return context.startTransaction(transactionType, methodName, messageSupplier, timer, OptionalThreadContext.AlreadyInTransactionBehavior.CAPTURE_NEW_TRANSACTION);
         }
 
         @OnReturn
-        public static void onReturn(@BindReturn Object returnedObject, @BindTraveler TraceEntry traceEntry) {
-            Dog dog = new Dog("Kaaju", 4, "yellow");
+        public static void onReturn(@BindReturn Object returnedObject,
+                                    @BindTraveler TraceEntry traceEntry) {
             try {
-//                Kryo kryo = new Kryo();
-//                kryo.setRegistrationRequired(false);
-//                logger.info(String.valueOf(returnedObject.hashCode()));
-//                kryo.setInstantiatorStrategy(new DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
-//
-//                Output output = new Output(new FileOutputStream("/home/user/file.txt", true));
-//                kryo.writeClassAndObject(output, returnedObject);
-//                output.close();
-//
-//                Input input = new Input(new FileInputStream("/home/user/file.txt"));
-//                Object deserializedReturnedObject = kryo.readClassAndObject(input);
-//                if (returnedObject.getClass().isInstance(deserializedReturnedObject)) {
-//                    logger.info("Object deserialized");
-//                    logger.info(String.valueOf(deserializedReturnedObject.hashCode()));
-//                }
-//                input.close();
-                XStream xStream = new XStream();
-                xStream.toXML(returnedObject, new FileWriter("/home/user/xstream-1.xml", true));
+                xStream.toXML(returnedObject, new FileWriter("/home/user/object-data/xstream-1.xml", true));
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            logger.info("returnedObject: " + returnedObject.getClass().getSimpleName());
             traceEntry.end();
         }
 
