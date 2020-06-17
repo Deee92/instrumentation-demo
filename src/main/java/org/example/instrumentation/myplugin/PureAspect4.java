@@ -4,6 +4,7 @@ import com.thoughtworks.xstream.XStream;
 import org.glowroot.agent.plugin.api.*;
 import org.glowroot.agent.plugin.api.weaving.*;
 
+import java.io.BufferedWriter;
 import java.io.FileWriter;
 
 public class PureAspect4 {
@@ -15,18 +16,30 @@ public class PureAspect4 {
         private static final String transactionType = "Pure";
         private static Logger logger = Logger.getLogger(PureMethodAdvice.class);
         private static XStream xStream = new XStream();
+        private static final String receivingObjectFilePath = "/home/user/object-data/4-receiving.xml";
+        private static final String parameterObjectFilePath = "/home/user/object-data/4-param.xml";
+        private static final String returnedObjectFilePath = "/home/user/object-data/4-returned.xml";
+
+        public static void writeObjectXMLToFile(Object objectToWrite, String objectFilePath) {
+            try {
+                FileWriter objectFileWriter = new FileWriter(objectFilePath, true);
+                xStream.toXML(objectToWrite, objectFileWriter);
+                BufferedWriter bw = new BufferedWriter(objectFileWriter);
+                bw.newLine();
+                bw.flush();
+                bw.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
         @OnBefore
         public static TraceEntry onBefore(OptionalThreadContext context,
                                           @BindReceiver Object receivingObject,
                                           @BindMethodName String methodName,
                                           @BindParameter Object parameterObject) {
-            try {
-                xStream.toXML(receivingObject, new FileWriter("/home/user/object-data/xstream-receiving-4.xml", true));
-                xStream.toXML(parameterObject, new FileWriter("/home/user/object-data/xstream-para-4.xml", true));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            writeObjectXMLToFile(receivingObject, receivingObjectFilePath);
+            writeObjectXMLToFile(parameterObject, parameterObjectFilePath);
             MessageSupplier messageSupplier = MessageSupplier.create(
                     "className: {}, methodName: {}",
                     PureMethodAdvice.class.getAnnotation(Pointcut.class).className(),
@@ -38,11 +51,7 @@ public class PureAspect4 {
         @OnReturn
         public static void onReturn(@BindReturn Object returnedObject,
                                     @BindTraveler TraceEntry traceEntry) {
-            try {
-                xStream.toXML(returnedObject, new FileWriter("/home/user/object-data/xstream-4.xml", true));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            writeObjectXMLToFile(returnedObject, returnedObjectFilePath);
             traceEntry.end();
         }
 

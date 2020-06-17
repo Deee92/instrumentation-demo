@@ -16,6 +16,10 @@
     "org.example.instrumentation.myplugin.PureAspect2",
     "org.example.instrumentation.myplugin.PureAspect3",
     "org.example.instrumentation.myplugin.PureAspect4",
-    "org.example.instrumentation.myplugin.PureAspect5"
+    "org.example.instrumentation.myplugin.PureAspect5",
+    "org.example.instrumentation.myplugin.PureAspect6",
+    "org.example.instrumentation.myplugin.PureAspect7",
+    "org.example.instrumentation.myplugin.PureAspect8",
+    "org.example.instrumentation.myplugin.PureAspect9"
   ]
 }

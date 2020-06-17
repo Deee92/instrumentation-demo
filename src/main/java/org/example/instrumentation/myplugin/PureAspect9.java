@@ -7,17 +7,17 @@ import org.glowroot.agent.plugin.api.weaving.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 
-public class PureAspect5 {
-    @Pointcut(className = "com.turn.ttorrent.client.peer.SharingPeer", methodName = "isInterested",
-            methodParameterTypes = {}, timerName = "sharing peer interested")
+public class PureAspect9 {
+    @Pointcut(className = "com.turn.ttorrent.common.protocol.udp.UDPAnnounceRequestMessage", methodName = "getNumWant",
+            methodParameterTypes = {}, timerName = "udp num want")
     public static class PureMethodAdvice {
 
         private static final TimerName timer = Agent.getTimerName(PureMethodAdvice.class);
         private static final String transactionType = "Pure";
         private static Logger logger = Logger.getLogger(PureMethodAdvice.class);
         private static XStream xStream = new XStream();
-        private static final String receivingObjectFilePath = "/home/user/object-data/5-receiving.xml";
-        private static final String returnedObjectFilePath = "/home/user/object-data/5-returned.xml";
+        private static final String receivingObjectFilePath = "/home/user/object-data/9-receiving.xml";
+        private static final String returnedObjectFilePath = "/home/user/object-data/9-returned.xml";
 
         public static void writeObjectXMLToFile(Object objectToWrite, String objectFilePath) {
             try {
