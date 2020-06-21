@@ -20,6 +20,27 @@
     "org.example.instrumentation.myplugin.PureAspect6",
     "org.example.instrumentation.myplugin.PureAspect7",
     "org.example.instrumentation.myplugin.PureAspect8",
-    "org.example.instrumentation.myplugin.PureAspect9"
+    "org.example.instrumentation.myplugin.PureAspect9",
+    "org.example.instrumentation.myplugin.PureAspect10",
+    "org.example.instrumentation.myplugin.PureAspect11",
+    "org.example.instrumentation.myplugin.PureAspect12",
+    "org.example.instrumentation.myplugin.PureAspect13",
+    "org.example.instrumentation.myplugin.PureAspect14",
+    "org.example.instrumentation.myplugin.PureAspect15",
+    "org.example.instrumentation.myplugin.PureAspect16",
+    "org.example.instrumentation.myplugin.PureAspect17",
+    "org.example.instrumentation.myplugin.PureAspect18",
+    "org.example.instrumentation.myplugin.PureAspect19",
+    "org.example.instrumentation.myplugin.PureAspect20",
+    "org.example.instrumentation.myplugin.PureAspect21",
+    "org.example.instrumentation.myplugin.PureAspect22",
+    "org.example.instrumentation.myplugin.PureAspect23",
+    "org.example.instrumentation.myplugin.PureAspect24",
+    "org.example.instrumentation.myplugin.PureAspect25",
+    "org.example.instrumentation.myplugin.PureAspect26",
+    "org.example.instrumentation.myplugin.PureAspect27",
+    "org.example.instrumentation.myplugin.PureAspect28",
+    "org.example.instrumentation.myplugin.PureAspect29",
+    "org.example.instrumentation.myplugin.PureAspect30"
   ]
 }
