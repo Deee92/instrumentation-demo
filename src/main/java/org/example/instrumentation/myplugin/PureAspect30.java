@@ -19,7 +19,7 @@ public class PureAspect30 {
         private static final String receivingObjectFilePath = "/home/user/object-data/30-receiving.xml";
         private static final String returnedObjectFilePath = "/home/user/object-data/30-returned.xml";
 
-        public static void writeObjectXMLToFile(Object objectToWrite, String objectFilePath) {
+        public static synchronized void writeObjectXMLToFile(Object objectToWrite, String objectFilePath) {
             try {
                 FileWriter objectFileWriter = new FileWriter(objectFilePath, true);
                 xStream.toXML(objectToWrite, objectFileWriter);
