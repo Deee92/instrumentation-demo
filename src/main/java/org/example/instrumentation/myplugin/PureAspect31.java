@@ -11,17 +11,16 @@ import org.glowroot.agent.plugin.api.weaving.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 
-public class PureAspect12 {
-    @Pointcut(className = "com.turn.ttorrent.client.LoadedTorrentImpl", methodName = "getTorrentHash",
-            methodParameterTypes = {}, timerName = "torrent hash")
+public class PureAspect31 {
+    @Pointcut(className = "com.turn.ttorrent.network.ConnectionManager", methodName = "getBindPort",
+            methodParameterTypes = {}, timerName = "bind port")
     public static class PureMethodAdvice {
-
         private static final TimerName timer = Agent.getTimerName(PureMethodAdvice.class);
         private static final String transactionType = "Pure";
         private static Logger logger = Logger.getLogger(PureMethodAdvice.class);
         private static XStream xStream = new XStream();
-        private static final String receivingObjectFilePath = "/home/user/object-data/12-receiving.xml";
-        private static final String returnedObjectFilePath = "/home/user/object-data/12-returned.xml";
+        private static final String receivingObjectFilePath = "/home/user/object-data/31-receiving.xml";
+        private static final String returnedObjectFilePath = "/home/user/object-data/31-returned.xml";
 
         public static synchronized void writeObjectXMLToFile(Object objectToWrite, String objectFilePath) {
             try {
@@ -32,7 +31,8 @@ public class PureAspect12 {
                 bw.flush();
                 bw.close();
             } catch (Exception e) {
-                logger.info("PureAspect12");
+                logger.info("PureAspect31");
+                e.printStackTrace();
             }
         }
 

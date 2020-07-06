@@ -41,6 +41,7 @@
     "org.example.instrumentation.myplugin.PureAspect27",
     "org.example.instrumentation.myplugin.PureAspect28",
     "org.example.instrumentation.myplugin.PureAspect29",
-    "org.example.instrumentation.myplugin.PureAspect30"
+    "org.example.instrumentation.myplugin.PureAspect30",
+    "org.example.instrumentation.myplugin.PureAspect31"
   ]
 }

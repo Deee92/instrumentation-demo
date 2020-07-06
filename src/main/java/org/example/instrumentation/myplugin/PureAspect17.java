@@ -1,6 +1,10 @@
 package org.example.instrumentation.myplugin;
 
 import com.thoughtworks.xstream.XStream;
+import org.example.instrumentation.converters.FileDescriptorConverter;
+import org.example.instrumentation.converters.RandomAccessFileConverter;
+import org.example.instrumentation.converters.ThreadConverter;
+import org.example.instrumentation.converters.ThreadGroupConverter;
 import org.glowroot.agent.plugin.api.*;
 import org.glowroot.agent.plugin.api.weaving.*;
 
@@ -22,6 +26,10 @@ public class PureAspect17 {
         public static synchronized void writeObjectXMLToFile(Object objectToWrite, String objectFilePath) {
             try {
                 FileWriter objectFileWriter = new FileWriter(objectFilePath, true);
+                xStream.registerConverter(new ThreadConverter());
+                xStream.registerConverter(new ThreadGroupConverter());
+                xStream.registerConverter(new RandomAccessFileConverter());
+                xStream.registerConverter(new FileDescriptorConverter());
                 xStream.toXML(objectToWrite, objectFileWriter);
                 BufferedWriter bw = new BufferedWriter(objectFileWriter);
                 bw.newLine();

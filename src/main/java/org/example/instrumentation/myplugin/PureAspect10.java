@@ -1,6 +1,10 @@
 package org.example.instrumentation.myplugin;
 
 import com.thoughtworks.xstream.XStream;
+import org.example.instrumentation.converters.FileDescriptorConverter;
+import org.example.instrumentation.converters.RandomAccessFileConverter;
+import org.example.instrumentation.converters.ThreadConverter;
+import org.example.instrumentation.converters.ThreadGroupConverter;
 import org.glowroot.agent.plugin.api.*;
 import org.glowroot.agent.plugin.api.weaving.*;
 
@@ -8,7 +12,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 
 public class PureAspect10 {
-    @Pointcut(className = "", methodName = "isDownloading",
+    @Pointcut(className = "com.turn.ttorrent.client.peer.SharingPeer", methodName = "isDownloading",
             methodParameterTypes = {}, timerName = "sharing peer downloading")
     public static class PureMethodAdvice {
 
@@ -28,6 +32,7 @@ public class PureAspect10 {
                 bw.flush();
                 bw.close();
             } catch (Exception e) {
+                logger.info("PureAspect10");
                 e.printStackTrace();
             }
         }
@@ -36,6 +41,10 @@ public class PureAspect10 {
         public static TraceEntry onBefore(OptionalThreadContext context,
                                           @BindReceiver Object receivingObject,
                                           @BindMethodName String methodName) {
+            xStream.registerConverter(new ThreadConverter());
+            xStream.registerConverter(new ThreadGroupConverter());
+            xStream.registerConverter(new RandomAccessFileConverter());
+            xStream.registerConverter(new FileDescriptorConverter());
             writeObjectXMLToFile(receivingObject, receivingObjectFilePath);
             MessageSupplier messageSupplier = MessageSupplier.create(
                     "className: {}, methodName: {}",

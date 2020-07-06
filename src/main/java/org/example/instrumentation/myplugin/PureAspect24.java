@@ -1,6 +1,10 @@
 package org.example.instrumentation.myplugin;
 
 import com.thoughtworks.xstream.XStream;
+import org.example.instrumentation.converters.FileDescriptorConverter;
+import org.example.instrumentation.converters.RandomAccessFileConverter;
+import org.example.instrumentation.converters.ThreadConverter;
+import org.example.instrumentation.converters.ThreadGroupConverter;
 import org.glowroot.agent.plugin.api.*;
 import org.glowroot.agent.plugin.api.weaving.*;
 
@@ -36,6 +40,10 @@ public class PureAspect24 {
         public static TraceEntry onBefore(OptionalThreadContext context,
                                           @BindReceiver Object receivingObject,
                                           @BindMethodName String methodName) {
+            xStream.registerConverter(new ThreadConverter());
+            xStream.registerConverter(new ThreadGroupConverter());
+            xStream.registerConverter(new RandomAccessFileConverter());
+            xStream.registerConverter(new FileDescriptorConverter());
             writeObjectXMLToFile(receivingObject, receivingObjectFilePath);
             MessageSupplier messageSupplier = MessageSupplier.create(
                     "className: {}, methodName: {}",
