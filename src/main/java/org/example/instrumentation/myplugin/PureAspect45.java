@@ -2,27 +2,24 @@ package org.example.instrumentation.myplugin;
 
 import com.thoughtworks.xstream.XStream;
 import org.example.instrumentation.converters.FileDescriptorConverter;
-import org.example.instrumentation.converters.RandomAccessFileConverter;
-import org.example.instrumentation.converters.ThreadConverter;
-import org.example.instrumentation.converters.ThreadGroupConverter;
 import org.glowroot.agent.plugin.api.*;
 import org.glowroot.agent.plugin.api.weaving.*;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 
-public class PureAspect25 {
+public class PureAspect45 {
     @Pointcut(className = "com.turn.ttorrent.network.ConnectionWorker", methodName = "getDefaultWriteErrorMessageWithSuffix",
-            methodParameterTypes = {"java.nio.channels.SocketChannel", "java.lang.String"}, timerName = "default error message")
+            methodParameterTypes = {"java.nio.channels.SocketChannel", "java.lang.String"}, timerName = "ConnectionWorker - getDefaultWriteErrorMessageWithSuffix")
     public static class PureMethodAdvice {
 
         private static final TimerName timer = Agent.getTimerName(PureMethodAdvice.class);
         private static final String transactionType = "Pure";
         private static Logger logger = Logger.getLogger(PureMethodAdvice.class);
         private static XStream xStream = new XStream();
-        private static final String receivingObjectFilePath = "/home/user/object-data/25-receiving.xml";
-        private static final String parameterObjectsFilePath = "/home/user/object-data/25-param.xml";
-        private static final String returnedObjectFilePath = "/home/user/object-data/25-returned.xml";
+        private static final String receivingObjectFilePath = "/home/user/object-data/45-receiving.xml";
+        private static final String parameterObjectFilePath = "/home/user/object-data/45-param.xml";
+        private static final String returnedObjectFilePath = "/home/user/object-data/45-returned.xml";
 
         public static synchronized void writeObjectXMLToFile(Object objectToWrite, String objectFilePath) {
             try {
@@ -33,7 +30,8 @@ public class PureAspect25 {
                 bw.flush();
                 bw.close();
             } catch (Exception e) {
-                logger.info("PureAspect25");
+                logger.info("PureAspect45");
+                e.printStackTrace();
             }
         }
 
@@ -42,12 +40,9 @@ public class PureAspect25 {
                                           @BindReceiver Object receivingObject,
                                           @BindParameterArray Object[] parameterObjects,
                                           @BindMethodName String methodName) {
-            xStream.registerConverter(new ThreadConverter());
-            xStream.registerConverter(new ThreadGroupConverter());
-            xStream.registerConverter(new RandomAccessFileConverter());
-            xStream.registerConverter(new FileDescriptorConverter());
+            // xStream.registerConverter(new FileDescriptorConverter());
             writeObjectXMLToFile(receivingObject, receivingObjectFilePath);
-            writeObjectXMLToFile(parameterObjects, parameterObjectsFilePath);
+            writeObjectXMLToFile(parameterObjects, parameterObjectFilePath);
             MessageSupplier messageSupplier = MessageSupplier.create(
                     "className: {}, methodName: {}",
                     PureMethodAdvice.class.getAnnotation(Pointcut.class).className(),

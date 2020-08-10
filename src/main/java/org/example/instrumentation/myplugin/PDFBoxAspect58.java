@@ -1,53 +1,65 @@
 package org.example.instrumentation.myplugin;
 
 import com.thoughtworks.xstream.XStream;
-import org.example.instrumentation.converters.FileDescriptorConverter;
-import org.example.instrumentation.converters.RandomAccessFileConverter;
-import org.example.instrumentation.converters.ThreadConverter;
-import org.example.instrumentation.converters.ThreadGroupConverter;
+import com.thoughtworks.xstream.core.util.QuickWriter;
+import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
+import com.thoughtworks.xstream.io.xml.StaxDriver;
+import com.thoughtworks.xstream.io.xml.XppDriver;
 import org.glowroot.agent.plugin.api.*;
 import org.glowroot.agent.plugin.api.weaving.*;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
-public class PureAspect25 {
-    @Pointcut(className = "com.turn.ttorrent.network.ConnectionWorker", methodName = "getDefaultWriteErrorMessageWithSuffix",
-            methodParameterTypes = {"java.nio.channels.SocketChannel", "java.lang.String"}, timerName = "default error message")
-    public static class PureMethodAdvice {
-
+public class PDFBoxAspect58 {
+    @Pointcut(className = "org.apache.fontbox.cmap.CIDRange", methodName = "map",
+            methodParameterTypes = {"char"}, timerName = "CIDRange - map")
+    public static class PureMethodAdvice implements AdviceTemplate {
         private static final TimerName timer = Agent.getTimerName(PureMethodAdvice.class);
         private static final String transactionType = "Pure";
+        private static final int COUNT = 58;
+        private static String receivingObjectFilePath;
+        private static String paramObjectsFilePath;
+        private static String returnedObjectFilePath;
         private static Logger logger = Logger.getLogger(PureMethodAdvice.class);
-        private static XStream xStream = new XStream();
-        private static final String receivingObjectFilePath = "/home/user/object-data/25-receiving.xml";
-        private static final String parameterObjectsFilePath = "/home/user/object-data/25-param.xml";
-        private static final String returnedObjectFilePath = "/home/user/object-data/25-returned.xml";
+
+        private static void setup() {
+            AdviceTemplate.setUpXStream();
+            String[] fileNames = AdviceTemplate.setUpFiles("org.apache.fontbox.cmap.CIDRange.map");
+            receivingObjectFilePath = fileNames[0];
+            paramObjectsFilePath = fileNames[1];
+            returnedObjectFilePath = fileNames[2];
+        }
 
         public static synchronized void writeObjectXMLToFile(Object objectToWrite, String objectFilePath) {
             try {
                 FileWriter objectFileWriter = new FileWriter(objectFilePath, true);
-                xStream.toXML(objectToWrite, objectFileWriter);
-                BufferedWriter bw = new BufferedWriter(objectFileWriter);
-                bw.newLine();
-                bw.flush();
-                bw.close();
+                String xml = xStream.toXML(objectToWrite);
+                xml = xml.replaceAll("(&#x)(\\w+;)", "&amp;#x$2");
+                BufferedReader reader = new BufferedReader(new StringReader(xml));
+                BufferedWriter writer = new BufferedWriter(objectFileWriter);
+                while ((xml = reader.readLine()) != null) {
+                    writer.write(xml);
+                    writer.newLine();
+                }
+                writer.flush();
+                writer.close();
             } catch (Exception e) {
-                logger.info("PureAspect25");
+                logger.info("PDFBoxAspect" + COUNT);
+                e.printStackTrace();
             }
         }
 
         @OnBefore
         public static TraceEntry onBefore(OptionalThreadContext context,
                                           @BindReceiver Object receivingObject,
-                                          @BindParameterArray Object[] parameterObjects,
+                                          @BindParameterArray Object parameterObjects,
                                           @BindMethodName String methodName) {
-            xStream.registerConverter(new ThreadConverter());
-            xStream.registerConverter(new ThreadGroupConverter());
-            xStream.registerConverter(new RandomAccessFileConverter());
-            xStream.registerConverter(new FileDescriptorConverter());
+            setup();
             writeObjectXMLToFile(receivingObject, receivingObjectFilePath);
-            writeObjectXMLToFile(parameterObjects, parameterObjectsFilePath);
+            writeObjectXMLToFile(parameterObjects, paramObjectsFilePath);
             MessageSupplier messageSupplier = MessageSupplier.create(
                     "className: {}, methodName: {}",
                     PureMethodAdvice.class.getAnnotation(Pointcut.class).className(),

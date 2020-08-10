@@ -1,30 +1,32 @@
 package org.example.instrumentation.myplugin;
 
-import com.thoughtworks.xstream.XStream;
-import org.example.instrumentation.converters.FileDescriptorConverter;
-import org.example.instrumentation.converters.RandomAccessFileConverter;
-import org.example.instrumentation.converters.ThreadConverter;
-import org.example.instrumentation.converters.ThreadGroupConverter;
 import org.glowroot.agent.plugin.api.*;
 import org.glowroot.agent.plugin.api.weaving.*;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 
-public class PureAspect25 {
-    @Pointcut(className = "com.turn.ttorrent.network.ConnectionWorker", methodName = "getDefaultWriteErrorMessageWithSuffix",
-            methodParameterTypes = {"java.nio.channels.SocketChannel", "java.lang.String"}, timerName = "default error message")
-    public static class PureMethodAdvice {
-
+public class PDFBoxAspect29 {
+    @Pointcut(className = "org.apache.pdfbox.pdmodel.graphics.color.PDDeviceRGB", methodName = "toRGB",
+            methodParameterTypes = {"float[]"}, timerName = "PDDeviceRGB - toRGB")
+    public static class PureMethodAdvice implements AdviceTemplate {
         private static final TimerName timer = Agent.getTimerName(PureMethodAdvice.class);
         private static final String transactionType = "Pure";
+        private static final int COUNT = 29;
         private static Logger logger = Logger.getLogger(PureMethodAdvice.class);
-        private static XStream xStream = new XStream();
-        private static final String receivingObjectFilePath = "/home/user/object-data/25-receiving.xml";
-        private static final String parameterObjectsFilePath = "/home/user/object-data/25-param.xml";
-        private static final String returnedObjectFilePath = "/home/user/object-data/25-returned.xml";
+        private static String receivingObjectFilePath;
+        private static String paramObjectsFilePath;
+        private static String returnedObjectFilePath;
 
-        public static synchronized void writeObjectXMLToFile(Object objectToWrite, String objectFilePath) {
+        private static void setup() {
+            AdviceTemplate.setUpXStream();
+            String[] fileNames = AdviceTemplate.setUpFiles("org.apache.pdfbox.pdmodel.graphics.color.PDDeviceRGB.toRGB");
+            receivingObjectFilePath = fileNames[0];
+            paramObjectsFilePath = fileNames[1];
+            returnedObjectFilePath = fileNames[2];
+        }
+
+        private static synchronized void writeObjectXMLToFile(Object objectToWrite, String objectFilePath) {
             try {
                 FileWriter objectFileWriter = new FileWriter(objectFilePath, true);
                 xStream.toXML(objectToWrite, objectFileWriter);
@@ -33,21 +35,19 @@ public class PureAspect25 {
                 bw.flush();
                 bw.close();
             } catch (Exception e) {
-                logger.info("PureAspect25");
+                logger.info("PDFBoxAspect" + COUNT);
+                e.printStackTrace();
             }
         }
 
         @OnBefore
         public static TraceEntry onBefore(OptionalThreadContext context,
                                           @BindReceiver Object receivingObject,
-                                          @BindParameterArray Object[] parameterObjects,
+                                          @BindParameterArray Object parameterObjects,
                                           @BindMethodName String methodName) {
-            xStream.registerConverter(new ThreadConverter());
-            xStream.registerConverter(new ThreadGroupConverter());
-            xStream.registerConverter(new RandomAccessFileConverter());
-            xStream.registerConverter(new FileDescriptorConverter());
+            setup();
             writeObjectXMLToFile(receivingObject, receivingObjectFilePath);
-            writeObjectXMLToFile(parameterObjects, parameterObjectsFilePath);
+            writeObjectXMLToFile(parameterObjects, paramObjectsFilePath);
             MessageSupplier messageSupplier = MessageSupplier.create(
                     "className: {}, methodName: {}",
                     PureMethodAdvice.class.getAnnotation(Pointcut.class).className(),
